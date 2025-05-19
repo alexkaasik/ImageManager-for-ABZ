@@ -15,7 +15,7 @@
 
         <label>Position:</label><br>
         <select name="Position" id="position">
-            @foreach ($positions as $position)
+            @foreach ($positions['positions'] as $position)
                 <option value="{{ $position['id'] }}">{{ $position['name'] }}</option>
             @endforeach
         </select><br><br>
