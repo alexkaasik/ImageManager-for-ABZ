@@ -7,9 +7,9 @@ use Illuminate\Support\Facades\Http;
 
 class UserController extends Controller
 {
-    public function GetUserForm()
+    public function viewUserForm()
     {
-        $request = Request::create('/positions', 'GET');
+        $request = Request::create(route('position.getPositions'), 'GET');
         $reponse = Route::dispatch($request);
         $positions = json_decode($reponse->getContent(), true);
 

@@ -5,8 +5,8 @@ use App\Http\Controllers\PositionController;
 use App\Http\Controllers\UserController;
 
 # API
-Route::get('/positions', [PositionController::class, 'GetPositions']);
+Route::get('/positions', [PositionController::class, 'getPositions'])->name('position.getPositions');;
 
 
 # Web page
-Route::get('/userform', [UserController::class, 'GetUserForm']);
+Route::get('/userform', [UserController::class, 'viewUserForm'])->name('user.viewUserForm');

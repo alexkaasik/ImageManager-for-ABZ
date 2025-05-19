@@ -2,7 +2,7 @@
     <title>Users Viewer</title>
     <h1>Create New User</h1>
 
-    <form action="/users" method="POST">
+    <form action="{{ route('user.viewUserForm') }}" method="POST">
         @csrf
         <label>Name:</label><br>
         <input type="text" name="FullName"><br><br>

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 
 class PositionController extends Controller
 {
-    public function GetPositions()
+    public function getPositions()
     {
         $positions = [
             ['id' => 1, 'name' => 'Lawyer'],
