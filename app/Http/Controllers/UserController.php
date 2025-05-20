@@ -7,28 +7,38 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-    public function showList()
-    {
-        $request = Request::create(route('user.get'), 'GET');
-        $reponse = Route::dispatch($request);
-        $Users = json_decode($reponse->getContent(), true);
+    // API route
+    public function getUsers()
+    {   
+        $users = User::all();
 
-        return View('ListUser', compact('Users'));
+        return response()->json(['success'=> true, 'User' => $users], 200);        
     }
 
-    public function showForm()
+    public function getUsersDetail($id) 
     {
-        $request = Request::create(route('position.getPositions'), 'GET');
-        $reponse = Route::dispatch($request);
-        $positions = json_decode($reponse->getContent(), true);
-
-        return view('CreateUser', compact('positions'));
-    }
-
-    public function getUsersDetail($id) {
+        if (is_int($id))
+        {
+            return response()->json([
+                'success'=> false,
+                'message' => 'The user with the requested id does not exist.',
+                'fail' => '"The user ID must be an integer."',
+            ], 400);
+        }
+        
         $user = User::find($id);
-    
-        return response()->json($user);
+
+        if (!$user) {
+            return response()->json([
+                'success'=> false,
+                'message' => 'User not found'
+            ], 404);
+        }
+
+        return response()->json([
+            'success'=> true,
+            'user' => $user
+        ], 200);
     }
 
     public function postUsers(Request $request)
@@ -45,9 +55,23 @@ class UserController extends Controller
         return redirect() -> route('user.viewUserList');
     }
 
-    public function getUsers()
-    {   
-        $data = User::all();
-        return response()->json(['success'=> true, 'Users' => $data], 200);        
+    // Web route
+
+    public function showList()
+    {
+        $request = Request::create(route('user.get'), 'GET');
+        $reponse = Route::dispatch($request);
+        $Users = json_decode($reponse->getContent(), true);
+
+        return View('ListUser', compact('Users'));
+    }
+
+    public function showForm()
+    {
+        $request = Request::create(route('position.getPositions'), 'GET');
+        $reponse = Route::dispatch($request);
+        $positions = json_decode($reponse->getContent(), true);
+
+        return view('CreateUser', compact('positions'));
     }
 }
