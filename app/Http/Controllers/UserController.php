@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http;
+use App\Models\User;
 
 class UserController extends Controller
 {
@@ -14,5 +14,19 @@ class UserController extends Controller
         $positions = json_decode($reponse->getContent(), true);
 
         return view('CreateUser', compact('positions'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'FullName' => 'required|string',
+            'E-Mail' => 'required|string',
+            'Phone' => 'required|string',
+            'PositionId' => 'required|numeric',
+        ]);
+
+        User::create($validated);
+
+        return redirect() -> route('user.viewUserForm');
     }
 }
