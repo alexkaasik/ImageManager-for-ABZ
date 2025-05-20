@@ -5,10 +5,10 @@ use App\Http\Controllers\PositionController;
 use App\Http\Controllers\UserController;
 
 # API
-Route::get('/positions', [PositionController::class, 'getPositions'])->name('position.getPositions');;
-Route::post('/user', [UserController::class, 'store'])->name('user.store');
-Route::get('/user', [UserController::class, 'getUsers'])->name('user.get');
-
+Route::get('/positions', [PositionController::class, 'getPositions'])->name('position.get');;
+Route::post('/users', [UserController::class, 'postUsers'])->name('user.store');
+Route::get('/users', [UserController::class, 'getUsers'])->name('user.get');
+Route::get('/users/{id}', [UserController::class, 'getUsersDetail'])->name('user.detail.get');
 # Web page
-Route::get('/userform', [UserController::class, 'viewUserForm'])->name('user.viewUserForm');
-Route::get('/userList', [UserController::class, 'viewUserList'])->name('user.viewUserList');
+Route::get('/form', [UserController::class, 'showForm'])->name('user.form');
+Route::get('/list', [UserController::class, 'showList'])->name('user.list');
