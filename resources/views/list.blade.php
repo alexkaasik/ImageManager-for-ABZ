@@ -2,7 +2,7 @@
     <title>Users Viewer</title>
     <h1>Users Viewer</h1>
 
-    <a href="{{ route('user.viewUserForm') }}">Create User</a>
+    <a href="{{ route('user.form') }}">Create User</a>
     <table>
         <tr>
             <th>
@@ -21,7 +21,7 @@
                 Position
             </th>
         </tr>
-        @forelse  ($Users['Users'] as $user) 
+        @forelse  ($users['users'] as $user) 
             <tr>
                 <td>
                     {{ $user['id'] }}

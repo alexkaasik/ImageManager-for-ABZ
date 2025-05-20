@@ -12,7 +12,10 @@ class UserController extends Controller
     {   
         $users = User::all();
 
-        return response()->json(['success'=> true, 'User' => $users], 200);        
+        return response()->json([
+            'success'=> true,
+            'users' => $users
+        ], 200);        
     }
 
     public function getUsersDetail($id) 
@@ -52,7 +55,7 @@ class UserController extends Controller
 
         User::create($validated);
 
-        return redirect() -> route('user.viewUserList');
+        return redirect() -> route('user.list');
     }
 
     // Web route
@@ -61,17 +64,17 @@ class UserController extends Controller
     {
         $request = Request::create(route('user.get'), 'GET');
         $reponse = Route::dispatch($request);
-        $Users = json_decode($reponse->getContent(), true);
+        $users = json_decode($reponse->getContent(), true);
 
-        return View('ListUser', compact('Users'));
+        return View('list', compact('users'));
     }
 
     public function showForm()
     {
-        $request = Request::create(route('position.getPositions'), 'GET');
+        $request = Request::create(route('position.get'), 'GET');
         $reponse = Route::dispatch($request);
         $positions = json_decode($reponse->getContent(), true);
 
-        return view('CreateUser', compact('positions'));
+        return view('form', compact('positions'));
     }
 }
