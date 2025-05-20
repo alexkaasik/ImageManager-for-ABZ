@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 
 class UserController extends Controller
@@ -24,7 +25,7 @@ class UserController extends Controller
         {
             return response()->json([
                 'success'=> false,
-                'message' => 'The user with the requested id does not exist.',
+                'message' => 'The user with the requested id does not exist',
                 'fail' => '"The user ID must be an integer."',
             ], 400);
         }
@@ -46,16 +47,50 @@ class UserController extends Controller
 
     public function postUsers(Request $request)
     {
-        $validated = $request->validate([
-            'FullName' => 'required|string',
-            'E-Mail' => 'required|string',
-            'Phone' => 'required|string',
-            'PositionId' => 'required|numeric',
+        $validator = Validator::make($request->all(), 
+        rules:
+        [
+            'FullName'    => 'required|string|min:2|max:60',
+            'E-Mail'      => 'required|email:rfc|unique:user,E-Mail',
+            'Phone'       => 'required|string',
+            'PositionId'  => 'required|numeric|min:1|max:4',
+        ],
+        messages:
+        [
+            'FullName.required' => 'Please provide your full name',
+            'FullName.min'      => 'Full name must be at least 2 characters',
+            'FullName.max'      => 'Full name must not exceed 60 characters',
+    
+            'E-Mail.required' => 'Email is required',
+            'E-Mail.email'    => 'Enter a valid email address',
+            'E-Mail.unique'   => 'This email is already in use',
+    
+            'Phone.required' => 'Phone number is required',
+    
+            'PositionId.required' => 'Position ID is required',
+            'PositionId.numeric'  => 'Position ID must be a number',
+            'PositionId.min'      => 'That positions doesn\'t exist',
+            'PositionId.max'      => 'That positions doesn\'t exist',
         ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+    
+        // If validation passes
+        $validated = $validator->validated();
+        $user = User::create($validated);
 
-        User::create($validated);
-
-        return redirect() -> route('user.list');
+        return response()->json([
+            'success' => true,
+            'Users'    => $user,
+            'message' => 'User created successfully',
+            
+        ], 201);   
     }
 
     // Web route
