@@ -1,5 +1,5 @@
 <div>
-    <title>Users Viewer</title>
+    <title>Create New User</title>
     <h1>Create New User</h1>
 
     <form action="{{ route('user.store') }}" method="POST">
