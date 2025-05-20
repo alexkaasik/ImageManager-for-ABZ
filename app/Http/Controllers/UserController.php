@@ -7,6 +7,15 @@ use App\Models\User;
 
 class UserController extends Controller
 {
+    public function viewUserList()
+    {
+        $request = Request::create(route('user.get'), 'GET');
+        $reponse = Route::dispatch($request);
+        $Users = json_decode($reponse->getContent(), true);
+
+        return View('ListUser', compact('Users'));
+    }
+
     public function viewUserForm()
     {
         $request = Request::create(route('position.getPositions'), 'GET');
@@ -27,6 +36,12 @@ class UserController extends Controller
 
         User::create($validated);
 
-        return redirect() -> route('user.viewUserForm');
+        return redirect() -> route('user.viewUserList');
+    }
+
+    public function getUsers()
+    {   
+        $data = User::all();
+        return response()->json(['success'=> true, 'Users' => $data], 200);        
     }
 }
