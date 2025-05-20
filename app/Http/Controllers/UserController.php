@@ -7,22 +7,11 @@ use App\Models\User;
 
 class UserController extends Controller
 {
-    public function showList()
-    {
-        $request = Request::create(route('user.get'), 'GET');
-        $reponse = Route::dispatch($request);
-        $Users = json_decode($reponse->getContent(), true);
-
-        return View('ListUser', compact('Users'));
-    }
-
-    public function showForm()
-    {
-        $request = Request::create(route('position.getPositions'), 'GET');
-        $reponse = Route::dispatch($request);
-        $positions = json_decode($reponse->getContent(), true);
-
-        return view('CreateUser', compact('positions'));
+    // API route
+    public function getUsers()
+    {   
+        $data = User::all();
+        return response()->json(['success'=> true, 'Users' => $data], 200);        
     }
 
     public function getUsersDetail($id) {
@@ -45,9 +34,23 @@ class UserController extends Controller
         return redirect() -> route('user.viewUserList');
     }
 
-    public function getUsers()
-    {   
-        $data = User::all();
-        return response()->json(['success'=> true, 'Users' => $data], 200);        
+    // Web route
+
+    public function showList()
+    {
+        $request = Request::create(route('user.get'), 'GET');
+        $reponse = Route::dispatch($request);
+        $Users = json_decode($reponse->getContent(), true);
+
+        return View('ListUser', compact('Users'));
+    }
+
+    public function showForm()
+    {
+        $request = Request::create(route('position.getPositions'), 'GET');
+        $reponse = Route::dispatch($request);
+        $positions = json_decode($reponse->getContent(), true);
+
+        return view('CreateUser', compact('positions'));
     }
 }
