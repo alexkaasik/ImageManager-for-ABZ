@@ -15,5 +15,8 @@ Route::get('/users/{id}', [UserController::class, 'getUsersDetail'])->name('user
 
 
 # Web page
+Route::get('/', function () {
+    return redirect()->route('user.list');
+});
 Route::get('/form', [UserController::class, 'showForm'])->name('user.form');
 Route::get('/list', [UserController::class, 'showList'])->name('user.list');
