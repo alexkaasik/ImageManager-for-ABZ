@@ -140,9 +140,9 @@ class UserController extends Controller
     {
         $request = Request::create(route('user.get'), 'GET');
         $reponse = Route::dispatch($request);
-        $users = json_decode($reponse->getContent(), true); 
+        $users = json_decode($reponse->getContent(), true);
 
-        return View('list', compact('users'));    
+        return View('list', compact('users'));
     }
 
     public function showForm()
