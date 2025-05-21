@@ -2,7 +2,7 @@
     @section('title')
         Create New User
     @endsection
-    <h1>Create New User</h1>
+    <h2 style="text-align: center;">Create New User</h2>
 
     @if ($errors->any())
         <div style="color:red;">
@@ -20,13 +20,13 @@
         <h2>Name:</h2>
         <input type="text" name="FullName"><br><br>
 
-        <label>Email:</label><br>
+        <h2>Email:</h2>
         <input type="text" name="E-Mail"><br><br>
 
-        <label>Phone:</label><br>
+        <h2>Phone:</h2>
         <input type="text" id="phone" name="Phone"><br><br>
 
-        <label>Position:</label><br>
+        <h2>Position:</h2>
         <select name="PositionId" id="position">
             @foreach ($positions['positions'] as $position)
                 <option value="{{ $position['id'] }}">{{ $position['name'] }}</option>
