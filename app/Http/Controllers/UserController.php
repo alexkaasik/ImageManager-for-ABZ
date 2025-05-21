@@ -9,9 +9,35 @@ use App\Models\User;
 class UserController extends Controller
 {
     // API route
-    public function getUsers()
+    public function getUsers(Request $request)
     {   
-        $users = User::all();
+
+        $validator = Validator::make($request->all(), 
+        rules:
+        [
+            'page' => 'required|numeric|min:1',
+            'count' => 'required|numeric|min:1',
+        ],
+        messages:
+        [
+            'page.min' => 'That page is too low',
+            'page.required' => 'page number is required',
+
+            'count.min' => 'That count is too low',
+            'count.required' => 'count number is required',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }       
+
+        #$users = User::all();
+        
+        $users = User::paginate(perPage: $request['count'], page: $request['page']);
 
         return response()->json([
             'success'=> true,
@@ -114,9 +140,9 @@ class UserController extends Controller
     {
         $request = Request::create(route('user.get'), 'GET');
         $reponse = Route::dispatch($request);
-        $users = json_decode($reponse->getContent(), true);
+        $users = json_decode($reponse->getContent(), true); 
 
-        return View('list', compact('users'));
+        return View('list', compact('users'));    
     }
 
     public function showForm()
