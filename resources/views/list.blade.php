@@ -1,5 +1,7 @@
-<div>
-    <title>Users Viewer</title>
+<x-layout>
+    @section('title')
+        Users Viewer
+    @endsection
     <h1>Users Viewer</h1>
 
     <a href="{{ route('user.form') }}">Create User</a>
@@ -43,4 +45,4 @@
             <tr><td colspan="5" style="text-align:center;" >No users are available </td></tr>
         @endforelse
     <table>
-</div>
+</x-layout>
