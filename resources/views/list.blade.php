@@ -2,10 +2,13 @@
     @section('title')
         Users Viewer
     @endsection
-    <h1>Users Viewer</h1>
+    <h2 style="text-align: center; padding: 12px; color: #000000 ;">Users Viewer</h2>
 
-    <a href="{{ route('user.form') }}">Create User</a>
-    <table>
+    <form action="{{ route('user.form') }}" method="get">
+        <button type="submit">Create User</button>
+    </form>
+    
+    <table style="color: #000000;">
         <tr>
             <th>
                 Id
