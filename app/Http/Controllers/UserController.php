@@ -52,20 +52,21 @@ class UserController extends Controller
         [
             'FullName'    => 'required|string|min:2|max:60',
             'E-Mail'      => 'required|email:rfc|unique:user,E-Mail',
-            'Phone'       => 'required|string',
+            'Phone'       => 'required|string|unique:user,Phone',
             'PositionId'  => 'required|numeric|min:1|max:4',
         ],
         messages:
         [
             'FullName.required' => 'Please provide your full name',
-            'FullName.min'      => 'Full name must be at least 2 characters',
-            'FullName.max'      => 'Full name must not exceed 60 characters',
+            'FullName.min'      => 'Name must be at least 2 characters',
+            'FullName.max'      => 'Name must not exceed 60 characters',
     
             'E-Mail.required' => 'Email is required',
             'E-Mail.email'    => 'Enter a valid email address',
             'E-Mail.unique'   => 'This email is already in use',
     
             'Phone.required' => 'Phone number is required',
+            'Phone.unique'   => 'This phone is already in use',
     
             'PositionId.required' => 'Position ID is required',
             'PositionId.numeric'  => 'Position ID must be a number',
@@ -91,6 +92,20 @@ class UserController extends Controller
             'message' => 'User created successfully',
             
         ], 201);   
+    }
+
+    public function handleFormPost(Request $request)
+    {
+        $response = $this->postUsers($request);
+        $data = $response->getData(true); 
+
+        if ($data['success']) {
+            return redirect()->route('user.list')->with('success', $data['message']);
+        } else {
+            return redirect()->back()
+                ->withErrors($data['errors'] ?? ['form' => $data['message']])
+                ->withInput();
+        }
     }
 
     // Web route

@@ -2,7 +2,18 @@
     <title>Create New User</title>
     <h1>Create New User</h1>
 
-    <form action="{{ route('user.store') }}" method="POST">
+    @if ($errors->any())
+        <div style="color:red;">
+            <strong>There were some problems with your input:</strong>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
+    <form action="{{ route('user.formhandler') }}" method="POST">
         @csrf
         <label>Name:</label><br>
         <input type="text" name="FullName"><br><br>
