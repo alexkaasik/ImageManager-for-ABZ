@@ -27,7 +27,16 @@
 						<!-- Nav -->
 							<nav id="nav">
 								<ul>
-								
+									<li>
+										<form action="{{ route('user.form') }}" method="get">
+											<button type="submit">Create</button>
+										</form>
+									</li>
+									<li>
+										<form action="{{ route('user.list') }}" method="get">
+											<button type="submit">View</button>
+										</form>
+									</li>
 								</ul>
 							</nav>
 

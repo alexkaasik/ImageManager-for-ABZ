@@ -2,11 +2,7 @@
     @section('title')
         Users Viewer
     @endsection
-    <h2 style="text-align: center; padding: 12px; color: #000000 ;">Users Viewer</h2>
-
-    <form action="{{ route('user.form') }}" method="get">
-        <button type="submit">Create User</button>
-    </form>
+    <h2 style="text-align: center; padding: 12px; color: #000000;">Users Viewer</h2>
     
     <table style="color: #000000;">
         <tr>

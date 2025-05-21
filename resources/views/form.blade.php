@@ -2,10 +2,10 @@
     @section('title')
         Create New User
     @endsection
-    <h2 style="text-align: center;">Create New User</h2>
+    <h2 style="text-align: center; padding: 12px; color: #000000;">Create New User</h2>
 
     @if ($errors->any())
-        <div style="color:red;">
+        <div style="color:red; background-color:rgb(217, 217, 217);">
             <strong>There were some problems with your input:</strong>
             <ul>
                 @foreach ($errors->all() as $error)
