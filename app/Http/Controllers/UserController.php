@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
@@ -9,14 +10,41 @@ use App\Models\User;
 class UserController extends Controller
 {
     // API route
-    public function getUsers()
+
+    public function getUsers(Request $request)
     {   
-        $users = User::all();
+        $validator = Validator::make($request->all(), 
+        rules:
+        [
+            'page' => 'required|numeric|min:1',
+            'count' => 'required|numeric|min:1',
+        ],
+        messages:
+        [
+            'page.min' => 'That page is too low',
+            'page.required' => 'page number is required',
+
+            'count.min' => 'That count is too low',
+            'count.required' => 'count number is required',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }       
+
+        #$users = User::all();
+        
+        $users = User::paginate(perPage: $request['count'], page: $request['page']);
 
         return response()->json([
             'success'=> true,
             'users' => $users
-        ], 200);        
+        ], 200);
+        
     }
 
     public function getUsersDetail($id) 
@@ -52,7 +80,7 @@ class UserController extends Controller
         [
             'FullName'    => 'required|string|min:2|max:60',
             'E-Mail'      => 'required|email:rfc|unique:user,E-Mail',
-            'Phone'       => 'required|string|unique:user,Phone',
+            'Phone'       => 'required|phone:AUTO|unique:user,Phone',
             'PositionId'  => 'required|numeric|min:1|max:4',
         ],
         messages:
@@ -66,12 +94,13 @@ class UserController extends Controller
             'E-Mail.unique'   => 'This email is already in use',
     
             'Phone.required' => 'Phone number is required',
+            'Phone.phone'   => 'You put wasn\'t a number',
             'Phone.unique'   => 'This phone is already in use',
     
             'PositionId.required' => 'Position ID is required',
             'PositionId.numeric'  => 'Position ID must be a number',
-            'PositionId.min'      => 'That positions doesn\'t exist',
-            'PositionId.max'      => 'That positions doesn\'t exist',
+            'PositionId.min'      => 'Pick a positions',
+            'PositionId.max'      => 'Pick a positions',
         ]);
     
         if ($validator->fails()) {
@@ -110,13 +139,33 @@ class UserController extends Controller
 
     // Web route
 
-    public function showList()
+    public function showList(Request $request)
     {
-        $request = Request::create(route('user.get'), 'GET');
-        $reponse = Route::dispatch($request);
-        $users = json_decode($reponse->getContent(), true);
 
-        return View('list', compact('users'));
+        if ($request['page'] == null){ $request['page'] = 1; }
+
+        $parameters = new Request([
+            'page' => $request['page'],
+            'count' => 6,
+        ]);
+
+        $response = $this->getUsers($parameters);
+        $users = json_decode($response->getContent(), true);
+    
+        $requestPosition = Request::create(route('position.get'), 'GET');
+        $reponsePosition = Route::dispatch($requestPosition);
+        $positions  = json_decode($reponsePosition->getContent(), true);
+        
+        $PositionMap = [];
+        foreach ($positions['positions'] as $position) {
+            $PositionMap[$position['id']] = $position['name'];
+        }
+
+        foreach ($users['users']['data'] as &$user) {
+            $user['PositionId'] = $PositionMap [$user['PositionId']];
+        }
+        
+        return view('list', ['users'=> $users['users']['data'], 'links' => $users['users']['links'],]);
     }
 
     public function showForm()
@@ -125,6 +174,6 @@ class UserController extends Controller
         $reponse = Route::dispatch($request);
         $positions = json_decode($reponse->getContent(), true);
 
-        return view('form', compact('positions'));
+        return view('form', ['positions'=> $positions['positions']]);
     }
 }
