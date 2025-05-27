@@ -43,7 +43,7 @@
         @empty
             <tr><td colspan="5" style="text-align:center;" >No users are available </td></tr>
         @endforelse
-    <table>
+        </table>
         <nav style="margin-top: 20px; text-align: center;">
             @foreach  ($links as $link) 
                 @if ($link['url'] != null)

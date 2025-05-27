@@ -148,18 +148,6 @@ class UserController extends Controller
             'page' => $request['page'],
             'count' => 6,
         ]);
-    
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation failed',
-                'errors'  => $validator->errors(),
-            ], 422);
-        }
-    
-        // If validation passes
-        $validated = $validator->validated();
-        $user = User::create($validated);
 
         $response = $this->getUsers($parameters);
         $users = json_decode($response->getContent(), true);
