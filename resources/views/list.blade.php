@@ -1,4 +1,4 @@
-<x-layout>
+<x-Layout>
     @section('title')
         Users Viewer
     @endsection
@@ -22,7 +22,7 @@
                 Position
             </th>
         </tr>
-        @forelse  ($users['users'] as $user) 
+        @forelse  ($users as $user) 
             <tr>
                 <td>
                     {{ $user['id'] }}
@@ -44,4 +44,4 @@
             <tr><td colspan="5" style="text-align:center;" >No users are available </td></tr>
         @endforelse
     <table>
-</x-layout>
+</x-Layout>

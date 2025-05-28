@@ -1,4 +1,4 @@
-<x-layout>
+<x-Layout>
     @section('title')
         Create New User
     @endsection
@@ -18,21 +18,21 @@
     <form action="{{ route('user.formhandler') }}" method="POST">
         @csrf
         <h2>Name:</h2>
-        <input type="text" name="FullName"><br><br>
+        <input type="text" name="FullName" placeholder="Full name"/><br><br>
 
         <h2>Email:</h2>
-        <input type="text" name="E-Mail"><br><br>
+        <input type="text" name="E-Mail" placeholder='Email addrss' /><br><br>
 
         <h2>Phone:</h2>
-        <input type="text" id="phone" name="Phone"><br><br>
+        <input type="text" id="phone" name="Phone" placeholder='+123 4567890' /><br><br>
 
         <h2>Position:</h2>
         <select name="PositionId" id="position">
-            @foreach ($positions['positions'] as $position)
+            @foreach ($positions as $position)
                 <option value="{{ $position['id'] }}">{{ $position['name'] }}</option>
             @endforeach
         </select><br><br>
 
         <button type="submit">Create User</button>
     </form>
-</x-layout>
+</x-Layout>
