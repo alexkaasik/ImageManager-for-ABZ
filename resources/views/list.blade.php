@@ -25,7 +25,8 @@
         @forelse  ($users as $user) 
             <tr>
                 <td>
-                    {{ $user['id'] }}
+                    <img src="{{ asset($user['Photo']) }}" alt="User Profile" width="500" height="600"> 
+                    
                 </td>
                 <td>
                     {{ $user['FullName'] }}

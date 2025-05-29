@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
@@ -82,6 +81,7 @@ class UserController extends Controller
             'E-Mail'      => 'required|email:rfc|unique:user,E-Mail',
             'Phone'       => 'required|phone:AUTO|unique:user,Phone',
             'PositionId'  => 'required|numeric|min:1|max:4',
+            'Photo'       => 'required|image',
         ],
         messages:
         [
@@ -101,6 +101,9 @@ class UserController extends Controller
             'PositionId.numeric'  => 'Position ID must be a number',
             'PositionId.min'      => 'Pick a positions',
             'PositionId.max'      => 'Pick a positions',
+
+            'Photo.required' => 'Photo is required',
+            'Photo.image' => 'Wasn\'t a imaged posted'
         ]);
     
         if ($validator->fails()) {
@@ -110,10 +113,22 @@ class UserController extends Controller
                 'errors'  => $validator->errors(),
             ], 422);
         }
-    
+        
+        $path = $request->file('Photo')->store('users','image'); 
+
+        // return response()->json([
+        //     'path'    => $path,            
+        // ], 201);  
+
         // If validation passes
         $validated = $validator->validated();
-        $user = User::create($validated);
+        $user = User::create([
+            'FullName'=> $validated['FullName'],
+            'E-Mail'=> $validated['E-Mail'],
+            'Phone'=> $validated['Phone'],
+            'PositionId'=> $validated['PositionId'],
+            'Photo'=> "image/$path",
+        ]);
 
         return response()->json([
             'success' => true,
@@ -126,7 +141,7 @@ class UserController extends Controller
     public function handleFormPost(Request $request)
     {
         $response = $this->postUsers($request);
-        $data = $response->getData(true); 
+        $data = $response->getData(true);
 
         if ($data['success']) {
             return redirect()->route('user.list')->with('success', $data['message']);

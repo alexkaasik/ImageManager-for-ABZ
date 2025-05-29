@@ -15,7 +15,7 @@
         </div>
     @endif
     <br>
-    <form action="{{ route('user.formhandler') }}" method="POST">
+    <form action="{{ route('user.formhandler') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <h2>Name:</h2>
         <input type="text" name="FullName" placeholder="Full name"/><br><br>
@@ -33,6 +33,9 @@
                 <option value="{{ $position['id'] }}">{{ $position['name'] }}</option>
             @endforeach
         </select><br><br>
+
+        <h2>Photo:</h2>
+        <input type="file" name="Photo"><br><br>
 
         <button type="submit">Create User</button>
     </form>
