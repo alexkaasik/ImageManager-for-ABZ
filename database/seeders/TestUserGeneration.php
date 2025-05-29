@@ -11,13 +11,16 @@ class TestUserGeneration extends Seeder
     public function run()
     {
         $faker = Faker::create();
-
+        
         foreach (range(1, 45) as $i) {
+
+
             User::create([
                 'FullName' => $faker->name,
                 'E-Mail' => $faker->unique()->safeEmail,
                 'Phone' => $faker->unique()->phoneNumber,
-                'PositionId' => rand(1, 4),
+                'PositionId' => $faker->numberBetween(1,4),
+                'Photo' => 'image/default' . $faker->numberBetween(0,3).'.jpg',
             ]);
         }
     }

@@ -1,10 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
+use Intervention\Image\Laravel\Facades\Image;
 use App\Models\User;
 
 class UserController extends Controller
@@ -82,6 +82,7 @@ class UserController extends Controller
             'E-Mail'      => 'required|email:rfc|unique:user,E-Mail',
             'Phone'       => 'required|phone:AUTO|unique:user,Phone',
             'PositionId'  => 'required|numeric|min:1|max:4',
+            'Photo'       => 'required|image|max:5120',
         ],
         messages:
         [
@@ -101,6 +102,10 @@ class UserController extends Controller
             'PositionId.numeric'  => 'Position ID must be a number',
             'PositionId.min'      => 'Pick a positions',
             'PositionId.max'      => 'Pick a positions',
+
+            'Photo.required' => 'Photo is required',
+            'Photo.image' => 'Wasn\'t a imaged posted',
+            'Photo.max' => 'You exceeded the file size'
         ]);
     
         if ($validator->fails()) {
@@ -110,10 +115,26 @@ class UserController extends Controller
                 'errors'  => $validator->errors(),
             ], 422);
         }
-    
-        // If validation passes
+        
+        $image = $request->file('Photo');   
+        $img = Image::read($image->path());
+        $resized=$img->cover(70, 70, 'center');
+        $jpgEncodedImage = $resized->encodeByMediaType('image/jpeg', progressive: true, quality: 20);
+
+        $imageName  = str()->random(15) . '.' . 'jpg';
+        $savePath = public_path('image/users/' . $imageName );
+        $destination = asset('image/users/' . $imageName );
+        
+        $jpgEncodedImage->save($savePath);
+
         $validated = $validator->validated();
-        $user = User::create($validated);
+        $user = User::create([
+            'FullName'=> $validated['FullName'],
+            'E-Mail'=> $validated['E-Mail'],
+            'Phone'=> $validated['Phone'],
+            'PositionId'=> $validated['PositionId'],
+            'Photo'=> $destination,
+        ]);
 
         return response()->json([
             'success' => true,
@@ -126,7 +147,7 @@ class UserController extends Controller
     public function handleFormPost(Request $request)
     {
         $response = $this->postUsers($request);
-        $data = $response->getData(true); 
+        $data = $response->getData(true);
 
         if ($data['success']) {
             return redirect()->route('user.list')->with('success', $data['message']);
