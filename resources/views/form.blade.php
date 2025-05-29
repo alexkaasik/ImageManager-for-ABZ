@@ -28,6 +28,7 @@
 
         <h2>Position:</h2>
         <select name="PositionId" id="position">
+            <option value="0">Select position</option>
             @foreach ($positions as $position)
                 <option value="{{ $position['id'] }}">{{ $position['name'] }}</option>
             @endforeach

@@ -44,4 +44,15 @@
             <tr><td colspan="5" style="text-align:center;" >No users are available </td></tr>
         @endforelse
     <table>
+        <nav style="margin-top: 20px; text-align: center;">
+            @foreach  ($links as $link) 
+                @if ($link['url'] != null)
+                    <a href="{{ $link['url'] }}" style="text-decoration:none; padding: 4px;{{ $link['active'] ? 'font-weight: bold;' : '' }}">
+                        {!! $link['label'] !!}
+                    </a>
+                @else
+                    {!! $link['label'] !!}
+                @endif
+            @endforeach
+        </nav>
 </x-Layout>

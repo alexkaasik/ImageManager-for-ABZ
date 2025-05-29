@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
@@ -9,14 +10,41 @@ use App\Models\User;
 class UserController extends Controller
 {
     // API route
-    public function getUsers()
+
+    public function getUsers(Request $request)
     {   
-        $users = User::all();
+        $validator = Validator::make($request->all(), 
+        rules:
+        [
+            'page' => 'required|numeric|min:1',
+            'count' => 'required|numeric|min:1',
+        ],
+        messages:
+        [
+            'page.min' => 'That page is too low',
+            'page.required' => 'page number is required',
+
+            'count.min' => 'That count is too low',
+            'count.required' => 'count number is required',
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }       
+
+        #$users = User::all();
+        
+        $users = User::paginate(perPage: $request['count'], page: $request['page']);
 
         return response()->json([
             'success'=> true,
             'users' => $users
-        ], 200);        
+        ], 200);
+        
     }
 
     public function getUsersDetail($id) 
@@ -71,8 +99,8 @@ class UserController extends Controller
     
             'PositionId.required' => 'Position ID is required',
             'PositionId.numeric'  => 'Position ID must be a number',
-            'PositionId.min'      => 'That positions doesn\'t exist',
-            'PositionId.max'      => 'That positions doesn\'t exist',
+            'PositionId.min'      => 'Pick a positions',
+            'PositionId.max'      => 'Pick a positions',
         ]);
     
         if ($validator->fails()) {
@@ -111,12 +139,31 @@ class UserController extends Controller
 
     // Web route
 
-    public function showList()
+    public function showList(Request $request)
     {
-        $requestUser = Request::create(route('user.get'), 'GET');
-        $reponseUser = Route::dispatch($requestUser);
-        $users = json_decode($reponseUser->getContent(), true);
 
+        if ($request['page'] == null){ $request['page'] = 1; }
+
+        $parameters = new Request([
+            'page' => $request['page'],
+            'count' => 6,
+        ]);
+    
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+    
+        // If validation passes
+        $validated = $validator->validated();
+        $user = User::create($validated);
+
+        $response = $this->getUsers($parameters);
+        $users = json_decode($response->getContent(), true);
+    
         $requestPosition = Request::create(route('position.get'), 'GET');
         $reponsePosition = Route::dispatch($requestPosition);
         $positions  = json_decode($reponsePosition->getContent(), true);
@@ -126,13 +173,11 @@ class UserController extends Controller
             $PositionMap[$position['id']] = $position['name'];
         }
 
-        foreach ($users['users'] as &$user) {
+        foreach ($users['users']['data'] as &$user) {
             $user['PositionId'] = $PositionMap [$user['PositionId']];
         }
-
-        $users = $users['users'];
         
-        return View('list', compact('users'));
+        return view('list', ['users'=> $users['users']['data'], 'links' => $users['users']['links'],]);
     }
 
     public function showForm()
@@ -141,8 +186,6 @@ class UserController extends Controller
         $reponse = Route::dispatch($request);
         $positions = json_decode($reponse->getContent(), true);
 
-        $positions = $positions['positions'];
-
-        return view('form', compact('positions'));
+        return view('form', ['positions'=> $positions['positions']]);
     }
 }
