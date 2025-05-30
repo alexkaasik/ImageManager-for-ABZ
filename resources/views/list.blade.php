@@ -1,4 +1,6 @@
 <x-Layout>
+    <style>
+    </style>
     @section('title')
         Users Viewer
     @endsection
@@ -6,43 +8,42 @@
     
     <table style="color: #000000;">
         <tr>
-            <th>
-                Id
+            <th class="tableTd">
+                
             </th>
-            <th>
+            <th class="tableTd">
                 Full Name
             </th>
-            <th>
+            <th class="tableTd">
                 E-Mail
             </th>
-            <th>
+            <th class="tableTd">
                 Phone
             </th>
-            <th>
+            <th class="tableTd">
                 Position
             </th>
         </tr>
         @forelse  ($users as $user) 
             <tr>
-                <td>
-                    <img src="{{ asset($user['Photo']) }}" alt="User Profile" width="500" height="600"> 
-                    
+                <td class="tableTd">
+                    <img src="{{ asset($user['Photo']) }}" alt="User Profile">                     
                 </td>
-                <td>
+                <td class="tableTd">
                     {{ $user['FullName'] }}
                 </td>
-                <td>
+                <td class="tableTd">
                     {{ $user['E-Mail'] }}
                 </td>
-                <td>
+                <td class="tableTd">
                     {{ $user['Phone'] }}
                 </td>
-                <td>
+                <td class="tableTd">
                     {{ $user['PositionId'] }}
                 </td>
             </tr>
         @empty
-            <tr><td colspan="5" style="text-align:center;" >No users are available </td></tr>
+            <tr style="vertical-align: middle;"><td colspan="5" style="text-align:center;" >No users are available </td></tr>
         @endforelse
         </table>
         <nav style="margin-top: 20px; text-align: center;">
