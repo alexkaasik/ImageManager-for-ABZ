@@ -20,7 +20,7 @@ class TestUserGeneration extends Seeder
                 'E-Mail' => $faker->unique()->safeEmail,
                 'Phone' => $faker->unique()->phoneNumber,
                 'PositionId' => $faker->numberBetween(1,4),
-                'Photo' => 'image/default' . $faker->numberBetween(0,3).'.jpg',
+                'Photo' => env('APP_URL') . '/image/default' . $faker->numberBetween(0,3).'.jpg',
             ]);
         }
     }

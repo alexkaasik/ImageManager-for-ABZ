@@ -39,6 +39,7 @@ class UserController extends Controller
         #$users = User::all();
         
         $users = User::paginate(perPage: $request['count'], page: $request['page']);
+        $users->setPath(route('user.list'));
 
         return response()->json([
             'success'=> true,
