@@ -20,16 +20,16 @@
         
         <input type="hidden" name="Token" value="{{ $token }}">
 
-        <h2>Name:</h2>
-        <input type="text" name="FullName" placeholder="Full name"/><br><br>
+        <h2>Name*</h2>
+        <input type="text" name="FullName" placeholder="Joe Doe"/><br><br>
 
-        <h2>Email:</h2>
-        <input type="text" name="E-Mail" placeholder='Email addrss' /><br><br>
+        <h2>Email*</h2>
+        <input type="text" name="E-Mail" placeholder='joe.doe@example' /><br><br>
 
-        <h2>Phone:</h2>
+        <h2>Phone*</h2>
         <input type="text" id="phone" name="Phone" placeholder='+123 4567890' /><br><br>
 
-        <h2>Position:</h2>
+        <h2>Position*</h2>
         <select name="PositionId" id="position">
             <option value="0">Select position</option>
             @foreach ($positions as $position)
@@ -37,7 +37,7 @@
             @endforeach
         </select><br><br>
 
-        <h2>Photo:</h2>
+        <h2>Photo*</h2>
         <input type="file" name="Photo"><br><br>
 
         <button type="submit">Create User</button>
