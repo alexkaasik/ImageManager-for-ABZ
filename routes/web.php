@@ -5,12 +5,12 @@ use App\Http\Controllers\PositionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AuthController;
 
-# API
+# API endpoint
 Route::get('/positions', [PositionController::class, 'getPositions'])->name('position.get');
-Route::post('/users', [UserController::class, 'postUsers'])->name('user.store');
-Route::post('/formhandler', [UserController::class, 'handleFormPost'])->name('user.formhandler');
 Route::get('/users', [UserController::class, 'getUsers'])->name('user.get');
 Route::get('/users/{id}', [UserController::class, 'getUsersDetail'])->name('user.detail.get');
+Route::post('/users', [UserController::class, 'postUsers'])->name('user.store');
+Route::post('/formhandler', [UserController::class, 'handleFormPost'])->name('user.formhandler');
 Route::post('/token', [AuthController::class, 'generate'])->name('token.generate');
 
 # Web page

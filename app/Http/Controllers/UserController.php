@@ -11,7 +11,18 @@ use App\Models\Token;
 class UserController extends Controller
 {
     // API route
-
+    
+    /*
+    * Functions to retrieve a list of users.
+    * 
+    * Why use Validator::make() instead of $request->validate()?  
+    * It allows adding custom error messages and attribute names.
+    * 
+    * The function requires two parameters: count and page.
+    * - count: Number of entries to display per page.
+    * - page: retrieve page numbers.
+    *   Used together with count to determine the range of records fetched
+    */
     public function getUsers(Request $request)
     {   
         $validator = Validator::make($request->all(), 
@@ -48,7 +59,9 @@ class UserController extends Controller
         ], 200);
         
     }
-
+    /*
+     * Getting specific user to retrieve
+     */
     public function getUsersDetail($id) 
     {
         if (is_int($id))
@@ -75,6 +88,10 @@ class UserController extends Controller
         ], 200);
     }
 
+    /*
+     * Validating incoming requests with custom messages
+     * And stores users with incoming request data
+     */
     public function postUsers(Request $request)
     {
         $validator = Validator::make($request->all(), 
@@ -110,6 +127,7 @@ class UserController extends Controller
             'Photo.max' => 'You exceeded the file size',
         ]);
         
+        // ---- Start Token Validations ----
         $token = Token::where('Token', '=', $request['Token'])->first();
 
         if ( !$token || $token['Used'] || $token['Expires_At'] < now() ) {
@@ -117,7 +135,9 @@ class UserController extends Controller
                 'success' => false,
                 'errors' => 'Your sessions has expired'
             ],401);
+            $token->update(['used' => true]);
         }
+        // ---- End Token Validations ----
 
         if ($validator->fails()) {
             return response()->json([
@@ -126,20 +146,20 @@ class UserController extends Controller
                 'errors'  => $validator->errors(),
             ], 422);
         }
-        
-        $token->update(['used' => true]);
-
+        // It's encoding image, size(70,70) and format to jpg and saving in filesystem.
         $image = $request->file('Photo');   
         $img = Image::read($image->path());
         $resized=$img->cover(70, 70, 'center');
         $jpgEncodedImage = $resized->encodeByMediaType('image/jpeg', progressive: true, quality: 20);
 
+        // Naming it with uniqe id for the file and stores
         $imageName  = str()->random(15) . '.' . 'jpg';
         $savePath = public_path('image/users/' . $imageName );
         $destination = asset('image/users/' . $imageName );
         
         $jpgEncodedImage->save($savePath);
-
+        
+        // Stores data in the database
         $validated = $validator->validated();
         $user = User::create([
             'FullName'=> $validated['FullName'],
@@ -157,6 +177,12 @@ class UserController extends Controller
         ], 201);   
     }
 
+    /*
+     * Middleware for handling user creation POST requests.
+     * It processes and forwards the request,
+     * if gives any errors sends back to user form 
+     * if request was okay, then it's goes to user list.
+     */
     public function handleFormPost(Request $request)
     {
         $response = $this->postUsers($request);
@@ -172,29 +198,35 @@ class UserController extends Controller
     }
 
     // Web route
-
+    /*
+     * Opens user list stored in the database.
+     */
     public function showList(Request $request)
     {
-
+        // adding a page parameter when sending request
         if ($request['page'] == null){ $request['page'] = 1; }
 
+        // Retrives list of users
         $parameters = new Request([
             'page' => $request['page'],
             'count' => 6,
         ]);
-
+        
         $response = $this->getUsers($parameters);
         $users = json_decode($response->getContent(), true);
     
+        // Retrives positions list
         $requestPosition = Request::create(route('position.get'), 'GET');
         $reponsePosition = Route::dispatch($requestPosition);
         $positions  = json_decode($reponsePosition->getContent(), true);
         
+        // Save possitions as dictionary 
         $PositionMap = [];
         foreach ($positions['positions'] as $position) {
             $PositionMap[$position['id']] = $position['name'];
         }
 
+        // Swaps Users positions id's with their name possition names
         foreach ($users['users']['data'] as &$user) {
             $user['PositionId'] = $PositionMap [$user['PositionId']];
         }
@@ -202,6 +234,9 @@ class UserController extends Controller
         return view('list', ['users'=> $users['users']['data'], 'links' => $users['users']['links'],]);
     }
 
+    /*
+     * Opens user creation form 
+     */
     public function showForm()
     {
         $requestPosition = Request::create(route('position.get'), 'GET');
@@ -209,9 +244,10 @@ class UserController extends Controller
 
         // $requestToken = Request::create(route('token.generate'), 'POST');
         // $reponseToken = Route::dispatch($requestToken);
+        
+        // Request::create() with post, give's error 419 sessions expired for unknown reasons 
         $reponseToken = app('App\Http\Controllers\AuthController')->generate();
         
-
         $positions = json_decode($reponsePosition->getContent(), true);
         $token = json_decode($reponseToken->getContent(), true);
         

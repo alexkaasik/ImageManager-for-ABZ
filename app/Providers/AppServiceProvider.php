@@ -19,6 +19,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Force HTTPS on system wide, by checking App_url
         if ( parse_url( env('APP_URL'))['scheme'] == 'https' ) {
             URL::forceScheme('https');
         }
