@@ -17,6 +17,9 @@
     <br>
     <form action="{{ route('user.formhandler') }}" method="POST" enctype="multipart/form-data">
         @csrf
+        
+        <input type="hidden" name="Token" value="{{ $token }}">
+
         <h2>Name:</h2>
         <input type="text" name="FullName" placeholder="Full name"/><br><br>
 
