@@ -8,13 +8,15 @@ use Faker\Factory as Faker;
 
 class TestUserGeneration extends Seeder
 {
+    /*
+     * Generating test users data, into the database
+     * Installing propaganistas/laravel-phone adding functionallity for validating phone numbers
+     */
     public function run()
     {
         $faker = Faker::create();
         
         foreach (range(1, 45) as $i) {
-
-
             User::create([
                 'FullName' => $faker->name,
                 'E-Mail' => $faker->unique()->safeEmail,
