@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Laravel\Facades\Image;
 use App\Models\User;
 use App\Models\Token;
+use Tinify\Tinify;
 
 class UserController extends Controller
 {
@@ -154,11 +155,29 @@ class UserController extends Controller
 
         // Naming it with uniqe id for the file and stores
         $imageName  = str()->random(15) . '.' . 'jpg';
-        $savePath = public_path('image/users/' . $imageName );
-        $destination = asset('image/users/' . $imageName );
+        #$savePath = public_path('image/users/' . $imageName );
+        $tempPath = storage_path('app/temp/' . $imageName);
+        //$destination = asset('image/users/' . $imageName );
         
-        $jpgEncodedImage->save($savePath);
+        $jpgEncodedImage->save($tempPath);
         
+        \Tinify\setKey(env("API_KEY_FOR_TINIPNG"));
+
+        try {
+            $source = \Tinify\fromFile($tempPath);
+            $savePath = public_path('image/users/' . $imageName );
+            $source->toFile($savePath);
+        } catch (\Tinify\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Image optimization failed',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+
+        unlink($tempPath); // Clean up temporary file
+        $destination = asset('image/users/' . $imageName);
+
         // Stores data in the database
         $validated = $validator->validated();
         $user = User::create([
