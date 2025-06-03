@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Laravel\Facades\Image;
 use App\Models\User;
+use App\Models\Token;
 
 class UserController extends Controller
 {
@@ -106,9 +107,18 @@ class UserController extends Controller
 
             'Photo.required' => 'Photo is required',
             'Photo.image' => 'Wasn\'t a imaged posted',
-            'Photo.max' => 'You exceeded the file size'
+            'Photo.max' => 'You exceeded the file size',
         ]);
-    
+        
+        $token = Token::where('Token', '=', $request['Token'])->first();
+
+        if ( !$token || $token['Used'] || $token['Expires_At'] < now() ) {
+            return response()->json([
+                'success' => false,
+                'errors' => 'Your sessions has expired'
+            ],401);
+        }
+
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
@@ -117,6 +127,8 @@ class UserController extends Controller
             ], 422);
         }
         
+        $token->update(['used' => true]);
+
         $image = $request->file('Photo');   
         $img = Image::read($image->path());
         $resized=$img->cover(70, 70, 'center');
@@ -192,10 +204,20 @@ class UserController extends Controller
 
     public function showForm()
     {
-        $request = Request::create(route('position.get'), 'GET');
-        $reponse = Route::dispatch($request);
-        $positions = json_decode($reponse->getContent(), true);
+        $requestPosition = Request::create(route('position.get'), 'GET');
+        $reponsePosition = Route::dispatch($requestPosition);
 
-        return view('form', ['positions'=> $positions['positions']]);
+        // $requestToken = Request::create(route('token.generate'), 'POST');
+        // $reponseToken = Route::dispatch($requestToken);
+        $reponseToken = app('App\Http\Controllers\AuthController')->generate();
+        
+
+        $positions = json_decode($reponsePosition->getContent(), true);
+        $token = json_decode($reponseToken->getContent(), true);
+        
+        return view('form', [
+            'positions'=> $positions['positions'],
+            'token' => $token['token']
+        ]);
     }
 }
